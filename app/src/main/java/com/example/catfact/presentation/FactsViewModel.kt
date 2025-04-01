@@ -11,15 +11,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 
-class FactsViewModel(val interactor: FactsInteractor) : ViewModel() {
+class FactsViewModel(private val interactor: FactsInteractor) : ViewModel() {
 
     private val _facts = MutableStateFlow(listOf<String>())
     val facts = _facts.asStateFlow()
 
     private var _isError = MutableSharedFlow<String>()
     val isError = _isError.asSharedFlow()
-
-    //var interactor = FactsInteractorImpl(FactsRepositoryImpl(FactsNetworkClientImpl()))
 
     init {
         getFact()
