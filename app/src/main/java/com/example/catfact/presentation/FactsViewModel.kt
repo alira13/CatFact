@@ -1,37 +1,48 @@
 package com.example.catfact.presentation
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.catfact.data.FactsRepositoryImpl
+import com.example.catfact.data.external.FactsNetworkClientImpl
+import com.example.catfact.domain.FactsInteractorImpl
+import com.example.catfact.domain.entity.FactResponse
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlin.random.Random
 
 
 class FactsViewModel : ViewModel() {
+    private val _facts = MutableStateFlow(listOf<String>())
+    val facts = _facts.asStateFlow()
 
-    var facts by mutableStateOf(listOf<String>())
-        private set
+    private var _isError = MutableSharedFlow<String>()
+    val isError = _isError.asSharedFlow()
+
+    var interactor = FactsInteractorImpl(FactsRepositoryImpl(FactsNetworkClientImpl()))
 
     init {
         getFact()
     }
 
     fun clearFacts() {
-        facts = emptyList()
+        _facts.value = emptyList()
     }
 
     fun getFact() {
         viewModelScope.launch {
-            val newFact = getFactFromUseCase()
-            facts = facts + newFact
+            interactor.getFact().collect {
+                when (it) {
+                    is FactResponse.Success -> {
+                        val newFact: String = it.data.fact!!
+                        _facts.value += newFact
+                    }
+                    is FactResponse.EmptyListError -> _isError.emit("Error: loaded fact is empty")
+                    is FactResponse.FactError -> _isError.emit("Error: network connection is failed")
+                }
+            }
         }
-    }
-
-    private fun getFactFromUseCase(): String {
-        val id = Random.nextInt(1, 100)
-        return "FactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFact$id"
     }
 }
 

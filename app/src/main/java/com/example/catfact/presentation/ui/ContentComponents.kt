@@ -51,7 +51,9 @@ fun FactImage(resId: Int, description: String) {
 @Composable
 fun ClearButton(text: String, onClick: () -> Unit) {
     ExtendedFloatingActionButton(
-        modifier = Modifier.fillMaxWidth().padding(8.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
         onClick = {
             onClick()
         },
@@ -60,6 +62,7 @@ fun ClearButton(text: String, onClick: () -> Unit) {
         }
     )
 }
+
 
 @Composable
 fun FactList(items: List<String>, onRefresh: () -> Unit) {

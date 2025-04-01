@@ -8,7 +8,7 @@ class FactsNetworkClientImpl : FactsNetworkClient {
     override suspend fun getFact(): FactResponse<Fact> {
         try {
             val response = RetrofitClient.api.getFact()
-            return if (response == null) {
+            return if (response?.fact == null) {
                 FactResponse.EmptyListError()
             } else {
                 FactResponse.Success(response)
