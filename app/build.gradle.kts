@@ -67,4 +67,7 @@ dependencies {
 
     //swiperefreshlayout
     implementation (libs.accompanist.swiperefresh)
+
+    // koin
+    implementation (libs.koin.android)
 }

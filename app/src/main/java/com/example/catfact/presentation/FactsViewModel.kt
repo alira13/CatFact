@@ -2,9 +2,7 @@ package com.example.catfact.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.catfact.data.FactsRepositoryImpl
-import com.example.catfact.data.external.FactsNetworkClientImpl
-import com.example.catfact.domain.FactsInteractorImpl
+import com.example.catfact.domain.FactsInteractor
 import com.example.catfact.domain.entity.FactResponse
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,14 +11,15 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 
-class FactsViewModel : ViewModel() {
+class FactsViewModel(val interactor: FactsInteractor) : ViewModel() {
+
     private val _facts = MutableStateFlow(listOf<String>())
     val facts = _facts.asStateFlow()
 
     private var _isError = MutableSharedFlow<String>()
     val isError = _isError.asSharedFlow()
 
-    var interactor = FactsInteractorImpl(FactsRepositoryImpl(FactsNetworkClientImpl()))
+    //var interactor = FactsInteractorImpl(FactsRepositoryImpl(FactsNetworkClientImpl()))
 
     init {
         getFact()
@@ -38,6 +37,7 @@ class FactsViewModel : ViewModel() {
                         val newFact: String = it.data.fact!!
                         _facts.value += newFact
                     }
+
                     is FactResponse.EmptyListError -> _isError.emit("Error: loaded fact is empty")
                     is FactResponse.FactError -> _isError.emit("Error: network connection is failed")
                 }
