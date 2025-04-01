@@ -14,6 +14,14 @@ class FactsViewModel : ViewModel() {
     var facts by mutableStateOf(listOf<String>())
         private set
 
+    init {
+        getFact()
+    }
+
+    fun clearFacts() {
+        facts = emptyList()
+    }
+
     fun getFact() {
         viewModelScope.launch {
             val newFact = getFactFromUseCase()
@@ -23,11 +31,7 @@ class FactsViewModel : ViewModel() {
 
     private fun getFactFromUseCase(): String {
         val id = Random.nextInt(1, 100)
-        return "Fact $id"
-    }
-
-    fun clearFacts() {
-        facts = emptyList()
+        return "FactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFactFact$id"
     }
 }
 
