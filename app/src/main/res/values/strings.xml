@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">Catfact</string>
     <string name="title_activity_main">MainActivity</string>
+    <string name="lbl_header">Did you know?...</string>
+    <string name="dsc_fact_image">"Cat image"</string>
+    <string name="lbl_ok">"OK"</string>
+    <string name="lbl_clear_button">"Clear"</string>
 </resources>
