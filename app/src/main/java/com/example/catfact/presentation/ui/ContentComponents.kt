@@ -11,20 +11,17 @@ import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.catfact.presentation.FactsViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-
 
 @Composable
 fun FactHeader(text: String) {
@@ -49,6 +46,22 @@ fun FactImage(resId: Int, description: String) {
 }
 
 @Composable
+fun FactCard(content: String) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+    ) {
+        Text(
+            text = content,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+        )
+    }
+}
+
+@Composable
 fun ClearButton(text: String, onClick: () -> Unit) {
     ExtendedFloatingActionButton(
         modifier = Modifier
@@ -63,38 +76,23 @@ fun ClearButton(text: String, onClick: () -> Unit) {
     )
 }
 
-
 @Composable
-fun FactList(items: List<String>, onRefresh: () -> Unit) {
-    var isRefreshing by rememberSaveable { mutableStateOf(false) }
+fun FactList(viewModel: FactsViewModel) {
+    val isRefreshing by viewModel.isLoading.collectAsState()
+    val facts by viewModel.facts.collectAsState()
+    val onRefresh = { viewModel.getFact() }
 
-    LaunchedEffect(isRefreshing) {
-        if (isRefreshing) {
-            onRefresh()
-            isRefreshing = false
-        }
-    }
-
-    SwipeRefresh(state = rememberSwipeRefreshState(isRefreshing),
-        onRefresh = { isRefreshing = true }) {
+    SwipeRefresh(
+        state = rememberSwipeRefreshState(isRefreshing),
+        onRefresh = onRefresh
+    ) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
         ) {
-            items(items.size) { index ->
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)
-                ) {
-                    Text(
-                        text = items[index],
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp)
-                    )
-                }
+            items(facts.count()) { index ->
+                FactCard(facts[index])
             }
         }
     }

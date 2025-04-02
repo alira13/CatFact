@@ -9,7 +9,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -20,9 +19,9 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun FactScreen(viewModel: FactsViewModel) {
-    val scaffoldState = remember{SnackbarHostState()}
+    val scaffoldState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
-    
+
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = scaffoldState) },
 
@@ -36,14 +35,7 @@ fun FactScreen(viewModel: FactsViewModel) {
                 modifier = Modifier.padding(innerPadding)
             ) {
                 FactHeader("Did you know?")
-
-                val facts = viewModel.facts.collectAsState(initial = null)
-                facts.value?.let { items ->
-                    FactList(items) {
-                        viewModel.getFact()
-                    }
-                }
-
+                FactList(viewModel)
                 FactImage(resId = R.drawable.ic_cat, description = "Cat image")
             }
         }

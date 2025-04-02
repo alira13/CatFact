@@ -6,18 +6,21 @@ import com.example.catfact.domain.FactsInteractor
 import com.example.catfact.domain.entity.FactResponse
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-
 class FactsViewModel(private val interactor: FactsInteractor) : ViewModel() {
-
+    // для маленького приложения оставила так, вообще делала бы один State
     private val _facts = MutableStateFlow(listOf<String>())
-    val facts = _facts.asStateFlow()
+    val facts get() = _facts.asStateFlow()
 
     private val _isError = MutableSharedFlow<String>()
-    val isError = _isError.asSharedFlow()
+    val isError get() = _isError.asSharedFlow()
+
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> get() = _isLoading.asStateFlow()
 
     init {
         getFact()
@@ -29,6 +32,7 @@ class FactsViewModel(private val interactor: FactsInteractor) : ViewModel() {
 
     fun getFact() {
         viewModelScope.launch {
+            _isLoading.emit(true)
             interactor.getFact().collect {
                 when (it) {
                     is FactResponse.Success -> {
@@ -36,10 +40,12 @@ class FactsViewModel(private val interactor: FactsInteractor) : ViewModel() {
                             _facts.value += fact
                         }
                     }
+
                     is FactResponse.EmptyListError -> _isError.emit("Error: loaded fact is empty")
                     is FactResponse.FactError -> _isError.emit("Error: network connection is failed")
                 }
             }
+            _isLoading.emit(false)
         }
     }
 }
