@@ -16,7 +16,7 @@ class FactsViewModel(private val interactor: FactsInteractor) : ViewModel() {
     private val _facts = MutableStateFlow(listOf<String>())
     val facts = _facts.asStateFlow()
 
-    private var _isError = MutableSharedFlow<String>()
+    private val _isError = MutableSharedFlow<String>()
     val isError = _isError.asSharedFlow()
 
     init {
@@ -32,10 +32,10 @@ class FactsViewModel(private val interactor: FactsInteractor) : ViewModel() {
             interactor.getFact().collect {
                 when (it) {
                     is FactResponse.Success -> {
-                        val newFact: String = it.data.fact!!
-                        _facts.value += newFact
+                        it.data.fact?.let { fact ->
+                            _facts.value += fact
+                        }
                     }
-
                     is FactResponse.EmptyListError -> _isError.emit("Error: loaded fact is empty")
                     is FactResponse.FactError -> _isError.emit("Error: network connection is failed")
                 }
